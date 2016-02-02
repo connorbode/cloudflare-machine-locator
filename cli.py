@@ -23,8 +23,7 @@ cf = Cloudflare.Cloudflare(settings.get_email(), settings.get_api_key())
 
 
 def list_zones():
-    cf.load_zones()
-    cf.list_zone_identifiers()
+    cf.print_zones()
 
 
 def list_dns_records():

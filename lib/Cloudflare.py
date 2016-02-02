@@ -23,16 +23,13 @@ class Cloudflare:
             raise CloudflareException
         return res.json()['result']
 
-    def load_zones(self):
-        results = self.get('/zones')
-        self.zones = {}
-        for result in results:
-            name = result['name']
-            self.zones[name] = result
-
-    def list_zone_identifiers(self):
-        for name, zone in self.zones.iteritems():
-            print("{}: {}".format(name, zone['id']))
+    def print_zones(self):
+        zones = self.get('/zones')
+        for zone in zones:
+            zone_id = zone['id']
+            name = zone['name']
+            line = "{} ({})".format(name, zone_id)
+            print(line)
 
     def print_dns_records(self, zone):
         url = '/zones/{}/dns_records'.format(zone)
