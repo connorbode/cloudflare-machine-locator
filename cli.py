@@ -33,7 +33,14 @@ def list_dns_records():
 
 
 def update_records():
-    pass
+    try:
+        ipinfo = IPInfo.IPInfo()
+        ip = ipinfo.get_ip()
+        cf.update_records(settings.get_zones(), ip)
+    except Cloudflare.CloudflareException as ex:
+        res = ex.args[0]
+        print res.status_code
+        print res.text
 
 actions = {
     "list_zones": list_zones,

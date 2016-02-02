@@ -20,7 +20,15 @@ class Cloudflare:
         url = "{0}{1}".format(Cloudflare.base_url, path)
         res = requests.get(url, headers=self.headers)
         if res.status_code != 200:
-            raise CloudflareException
+            raise CloudflareException(res)
+        return res.json()['result']
+
+    def put(self, path, data):
+        url = "{}{}".format(Cloudflare.base_url, path)
+        print data
+        res = requests.put(url, headers=self.headers, data=data)
+        if res.status_code != 200:
+            raise CloudflareException(res)
         return res.json()['result']
 
     def print_zones(self):
@@ -41,3 +49,18 @@ class Cloudflare:
             dns_id = record['id']
             line = "{} {} -> {} ({})".format(dns_type, name, ip, dns_id)
             print(line)
+
+    def update_records(self, zones, ip):
+
+        for zone, records in zones.iteritems():
+            zone_path = '/zones/{}'.format(zone)
+            for record in records:
+
+                data = {
+                    "type": "A",
+                    "content": ip,
+                    "id": record
+                }
+
+                path = '{}/dns_records/{}'.format(zone_path, record)
+                self.put(path, data)

@@ -12,3 +12,7 @@ class Settings:
 
     def get_email(self):
         return self.settings['email']
+
+    def get_zones(self):
+        return self.settings['zones']
+
