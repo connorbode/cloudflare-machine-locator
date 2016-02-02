@@ -1,6 +1,5 @@
 from lib import Cloudflare, IPInfo, Settings
 from optparse import OptionParser
-import sys
 
 
 parser = OptionParser(usage="usage: %prog [options] settings_file")
