@@ -51,7 +51,7 @@ class Cloudflare:
 
     def update_records(self, zones, ip):
 
-        for zone, records in zones.iteritems():
+        for zone, records in zones.items():
             zone_path = '/zones/{}'.format(zone)
             for record in records:
 
