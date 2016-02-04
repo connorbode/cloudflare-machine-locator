@@ -39,8 +39,8 @@ def update_records():
         cf.update_records(settings.get_zones(), ip)
     except Cloudflare.CloudflareException as ex:
         res = ex.args[0]
-        print res.status_code
-        print res.text
+        print(res.status_code)
+        print(res.text)
 
 actions = {
     "list_zones": list_zones,
