@@ -25,8 +25,7 @@ class Cloudflare:
 
     def put(self, path, data):
         url = "{}{}".format(Cloudflare.base_url, path)
-        print data
-        res = requests.put(url, headers=self.headers, data=data)
+        res = requests.put(url, headers=self.headers, json=data)
         if res.status_code != 200:
             raise CloudflareException(res)
         return res.json()['result']
@@ -59,8 +58,9 @@ class Cloudflare:
                 data = {
                     "type": "A",
                     "content": ip,
-                    "id": record
+                    "id": record['id'],
+                    "name": record['name']
                 }
 
-                path = '{}/dns_records/{}'.format(zone_path, record)
+                path = '{}/dns_records/{}'.format(zone_path, record['id'])
                 self.put(path, data)
