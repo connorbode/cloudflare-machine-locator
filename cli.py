@@ -1,5 +1,65 @@
 from lib import Cloudflare, IPInfo, Settings
 from optparse import OptionParser
+import sys
+
+
+def which_from_list(items, message, prop=lambda i: i):
+    """
+    Asks the user to pick from the list
+    """
+    choice = None
+    while not choice:
+        print(message)
+        for index, item in enumerate(items):
+            title = prop(item)
+            print("({}) {}".format(index + 1, title))
+        print("~~> ", end="", flush=True)
+        read = sys.stdin.readline()
+        try:
+            num = int(read)
+            if num < 1 or num > len(items):
+                raise IndexError
+            choice = items[num - 1]
+        except ValueError:
+            print("Sorry, I didn't understand")
+        except IndexError:
+            print("Sorry, I didn't understand")
+    return choice
+
+
+def get_action():
+    """
+    Prompts the user for an action
+    """
+    actions = [
+        {"message": "Add a record", "action": "add_record"},
+        {"message": "List zones", "action": "list_zones"},
+        {"message": "List DNS records for a zone", "action": "list_dns_records"},
+        {"message": "Update records", "action": "update_records"}
+    ]
+    message = "What would you like to do?"
+    prop = lambda a: a['message']
+    action = which_from_list(actions, message, prop)
+    return action['action']
+
+
+def list_zones():
+    cf.print_zones()
+
+
+def add_record():
+    """
+    Adds a DNS record to update to this server
+    """
+    zones = cf.get_zones()
+    message = "Which zone is the DNS record in?"
+    prop = lambda z: z['name']
+    zone = which_from_list(zones, message, prop)
+    message = "Which DNS record would you like to track?"
+    records = cf.get_dns_records(zone['id'])
+    prop = lambda r: "{} {} -> {}".format(r['type'], r['name'], r['content'])
+    record = which_from_list(records, message, prop)
+
 
 
 parser = OptionParser()
@@ -12,18 +72,18 @@ parser.add_option("-z", "--zone", dest="zone",
 
 (options, args) = parser.parse_args()
 
+
 if not options.settings:
     parser.error("settings file must be specified")
 
 if not options.action:
-    parser.error("action must be specified")
+    print("No action specified.")
+    options.action = get_action()
 
 settings = Settings.Settings(options.settings)
 cf = Cloudflare.Cloudflare(settings.get_email(), settings.get_api_key())
 
 
-def list_zones():
-    cf.print_zones()
 
 
 def list_dns_records():
@@ -43,6 +103,7 @@ def update_records():
         print(res.text)
 
 actions = {
+    "add_record": add_record,
     "list_zones": list_zones,
     "list_dns_records": list_dns_records,
     "update_records": update_records

@@ -38,6 +38,9 @@ class Cloudflare:
             line = "{} ({})".format(name, zone_id)
             print(line)
 
+    def get_zones(self):
+        return self.get('/zones')
+
     def print_dns_records(self, zone):
         url = '/zones/{}/dns_records'.format(zone)
         records = self.get(url)
@@ -48,6 +51,10 @@ class Cloudflare:
             dns_id = record['id']
             line = "{} {} -> {} ({})".format(dns_type, name, ip, dns_id)
             print(line)
+
+    def get_dns_records(self, zone):
+        url = '/zones/{}/dns_records'.format(zone)
+        return self.get(url)
 
     def update_records(self, zones, ip):
 
