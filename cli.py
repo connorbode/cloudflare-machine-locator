@@ -59,7 +59,7 @@ def add_record():
     records = cf.get_dns_records(zone['id'])
     prop = lambda r: "{} {} -> {}".format(r['type'], r['name'], r['content'])
     record = which_from_list(records, message, prop)
-
+    settings.add_record(zone['id'], record['id'], record['name'])
 
 
 parser = OptionParser()

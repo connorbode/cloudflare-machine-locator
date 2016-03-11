@@ -57,7 +57,6 @@ class Cloudflare:
         return self.get(url)
 
     def update_records(self, zones, ip):
-
         for zone, records in zones.items():
             zone_path = '/zones/{}'.format(zone)
             for record in records:
