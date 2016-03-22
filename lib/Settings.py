@@ -3,6 +3,13 @@ import json
 
 class Settings:
 
+    def generate(email, api_key, file_handle):
+        settings = {
+            'email': email,
+            'api_key': api_key
+        }
+        json.dump(settings, file_handle)
+
     def __init__(self, settings_file_path):
         self.settings_file_path = settings_file_path
         settings_file = open(settings_file_path, 'r')

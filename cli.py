@@ -27,6 +27,12 @@ def which_from_list(items, message, prop=lambda i: i):
     return choice
 
 
+def get_input(message):
+    print(message)
+    print("~~> ", end="", flush=True)
+    return sys.stdin.readline()[:-1]
+
+
 def get_action():
     """
     Prompts the user for an action
@@ -62,6 +68,53 @@ def add_record():
     settings.add_record(zone['id'], record['id'], record['name'])
 
 
+def generate_settings():
+    '''
+    Generates a settings file for the application
+    '''
+
+    # loop until we get valid credentials
+    valid = False
+    while not valid:
+        email = get_input("What is the email address associated with your Cloudflare account?")
+        api_key = get_input("What is your Cloudflare API key?")
+        cf = Cloudflare.Cloudflare(email, api_key)
+        try:
+            cf.get_zones()
+            valid = True
+        except Cloudflare.CloudflareException:
+            print("Cloudflare says your credentials are invalid.")
+
+    # loop until we get valid file
+    valid = False
+    while not valid:
+        try:
+            store = get_input("Where would you like to store the settings file?")
+            with open(store, 'w') as f:
+                Settings.generate(email, api_key, f)
+            valid = True
+        except Exception as e:
+            print(e)
+            print("We couldn't write to that file")
+
+    # set the settings for the rest of the program
+    options.settings = store
+
+
+def load_settings():
+    if not options.settings:
+        actions = [
+            {"message": "Generate settings file", "action": "generate_settings"},
+            {"message": "Locate settings file", "action": "locate_settings"}
+        ]
+        prop = lambda a: a['message']
+        message = "A settings file was not specified."
+        action = which_from_list(actions, message, prop)
+        if action['action'] == 'generate_settings':
+            generate_settings()
+        elif action['action'] == 'locate_settings':
+            locate_settings()
+
 parser = OptionParser()
 parser.add_option("-s", "--settings",
                   dest="settings", help="path to settings file")
@@ -72,9 +125,7 @@ parser.add_option("-z", "--zone", dest="zone",
 
 (options, args) = parser.parse_args()
 
-
-if not options.settings:
-    parser.error("settings file must be specified")
+load_settings()
 
 if not options.action:
     print("No action specified.")
