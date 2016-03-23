@@ -91,7 +91,7 @@ def generate_settings():
         try:
             store = get_input("Where would you like to store the settings file?")
             with open(store, 'w') as f:
-                Settings.generate(email, api_key, f)
+                Settings.Settings.generate(email, api_key, f)
             valid = True
         except Exception as e:
             print(e)
