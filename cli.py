@@ -94,11 +94,32 @@ def generate_settings():
                 Settings.Settings.generate(email, api_key, f)
             valid = True
         except Exception as e:
-            print(e)
-            print("We couldn't write to that file")
+            print("I couldn't write to that file")
 
     # set the settings for the rest of the program
     options.settings = store
+
+
+def locate_settings():
+    '''
+    Locates a settings file for the application
+    '''
+
+    # loop until we get a valid file
+    valid = False
+    while not valid:
+        try:
+            path = get_input("What is the path to your settings file?")
+            with open(path, 'w') as f:
+                settings = Settings.Settings(path)
+                cf = Cloudflare.Cloudflare(settings['email'], settings['api_key'])
+                cf.get_zones()
+            valid = True
+        except (IOError, OSError):
+            print("I couldn't open that file (I need read and write permission)")
+        except Cloudflare.CloudflareException:
+            print("Settings file seems to be invalid")
+
 
 
 def load_settings():
